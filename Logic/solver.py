@@ -20,7 +20,7 @@ except IOError as err:
 class Solver():
 	def initialize(self, path_to_input):
 		input_ = fileReader.FileReader.read_input(path_to_input)
-		print input_
+		#print input_
 		self.N = input_['N']
 		self.V = input_['V']
 		self.P = float(input_['P'])
@@ -30,18 +30,39 @@ class Solver():
 		self.p_acum = 0
 		self.C = [0] * self.N
 
-	def add_constraints(self):
-		lp.addConstraint({"Q" : 1, } ,"<=", 1)
-		lp.addConstraint({"C" : 1, } ,"<=", 1)
-		lp.setBinary(0)
-		lp.setBinary(1)		
+	def solve_(self):
+		self._add_constraints()
+		self._set_objective()
+		lp.solve()
+		return lp.getSolution()
 
-		coeffs = self.p[:]
-		#for i in range(0, self.N):
-		#	lp.addConstraint(coeffs, "<=", )
+	def _add_constraints(self):
+
+		coeff_p = self.p[:]
+		coeff_p.append(self.P * -1)
+		coeff_v = self.v[:]
+		coeff_v.append(self.V * -1)
+		coeffs = [1] * self.N
+		coeffs.append(-1)
+		for i in range(0, self.N):
+			lp.addConstraint(coeff_p, "<=", 0)
+			lp.addConstraint(coeff_v, "<=", 0)
+
+		lp.addConstraint(coeffs, "=", 0)
+
+		print lp.get_column(1)
+
+		for i in range(1, self.N ):
+			lp.setBinary(i)
+
+	def _set_objective(self):
+		coeffs = [1] * self.N
+		lp.setObjective(coeffs, mode="minimize")
 
 
+
+		
 
 s = Solver()
 s.initialize("/home/crisefd/Documentos/Python/prueba.txt")
-s.add_constraints()
+print s.solve_()
