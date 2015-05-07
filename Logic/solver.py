@@ -20,12 +20,12 @@ except IOError as err:
 class Solver():
 	def initialize(self, path_to_input):
 		input_ = fileReader.FileReader.read_input(path_to_input)
-		#print input_
-		self.N = input_['N']
-		self.V = input_['V']
+		#print input_['v']
+		self.N = int(input_['N'])
+		self.V = float(input_['V'])
 		self.P = float(input_['P'])
-		self.v = input_['v']
-		self.p = input_['p']
+		self.v = map(float, input_['v'])
+		self.p = map(float, input_['p'])
 		self.v_acum = 0
 		self.p_acum = 0
 		self.C = [0] * self.N
@@ -42,22 +42,33 @@ class Solver():
 		coeff_p.append(self.P * -1)
 		coeff_v = self.v[:]
 		coeff_v.append(self.V * -1)
+		coeff_vp = []
+		#print coeff_v
+		#print coeff_p
+		for i in range(0, self.N + 1):
+			coeff_vp.append(coeff_v[i] + coeff_p[i])
+
 		coeffs = [1] * self.N
-		coeffs.append(-1)
+		#coeffs.append(-1)
+		#print coeff_vp
 		for i in range(0, self.N):
-			lp.addConstraint(coeff_p, "<=", 0)
-			lp.addConstraint(coeff_v, "<=", 0)
+			lp.addConstraint(coeff_vp, "<=", 0)
+			#lp.addConstraint(coeff_p, "<=", 0)
+			#lp.addConstraint(coeff_v, "<=", 0)
 
-		lp.addConstraint(coeffs, "=", 0)
+		lp.addConstraint(coeffs, "=", 1)
 
-		print lp.get_column(1)
+		#print lp.geColumn(1)
 
-		for i in range(1, self.N ):
+		for i in range(1, self.N + 1):
 			lp.setBinary(i)
 
 	def _set_objective(self):
-		coeffs = [1] * self.N
+		coeffs = [0] * (self.N)
+		coeffs.append(1)
 		lp.setObjective(coeffs, mode="minimize")
+		
+
 
 
 
