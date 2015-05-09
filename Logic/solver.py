@@ -20,7 +20,7 @@ except IOError as err:
 class Solver():
 	def initialize(self, path_to_input):
 		input_ = fileReader.FileReader.read_input(path_to_input)
-		#print input_['v']
+		print input_
 		self.N = int(input_['N'])
 		self.V = float(input_['V'])
 		self.P = float(input_['P'])
@@ -34,7 +34,10 @@ class Solver():
 		self._add_constraints()
 		self._set_objective()
 		lp.solve()
-		return lp.getSolution()
+		print "=========================================="
+		print "Solution: ", lp.getSolution()
+		print "Solution value: ", lp.getObjectiveValue()
+		print "Info: ", lp.getInfo('Iterations')
 
 	def _add_constraints(self):
 
@@ -43,29 +46,70 @@ class Solver():
 		coeff_v = self.v[:]
 		coeff_v.append(self.V * -1)
 		coeff_vp = []
-		#print coeff_v
-		#print coeff_p
 		for i in range(0, self.N + 1):
 			coeff_vp.append(coeff_v[i] + coeff_p[i])
 
-		coeffs = [1] * self.N
-		#coeffs.append(-1)
-		#print coeff_vp
+		coeffs = [1] * (self.N )
+		coeffs.append(-1)
+		
+		L = self.N * self.N + self.N
+		indices = [i for i in range(0, L)]
+		rhs = [0 for i in range(0, self.N)]
+		coefficients = []
+		k = 0
 		for i in range(0, self.N):
-			lp.addConstraint(coeff_vp, "<=", 0)
-			#lp.addConstraint(coeff_p, "<=", 0)
-			#lp.addConstraint(coeff_v, "<=", 0)
+			n = 0
+			#print "i=",i
+			tuple_ = [0] * L
+			if i==0:
+				x = k
+				y = (i + 1) * (self.N + 1)
+				k = k + self.N 
+			else:
+				x = k + 1
+				y = (i+1) * (self.N + 1)
+				k = k + self.N + 1
+			#print "x=", x
+			#print "y=", y
+			for j in range(x, y):
+				#print "j=",j,"n=",n
+				try:
+					tuple_[j] = coeff_vp[n]
+				except IndexError:
+					print "Error j=",j,"n=", n
+				n += 1
+			coefficients.append(tuple_)
+			
 
-		lp.addConstraint(coeffs, "=", 1)
+		#for i in range(0, self.N):
+		#	coefficients.append(coeff_vp)
+		
+		print "\n indices ", indices
+		print "Constraints coeffs", coefficients
+		print "rhs ", rhs
+		lp.addConstraint((indices, coefficients), "<=", rhs)
+		c = [0] * L
+		z = 0
+		while z < L:
+			c[z] = 1
+			z += self.N + 1
 
-		#print lp.geColumn(1)
-
-		for i in range(1, self.N + 1):
-			lp.setBinary(i)
+		print "Last constraint coeffs ", c
+		lp.addConstraint(c, "==", 1)
+		lp.setBinary(indices)
+		#for i in range(0, L):
+		#	lp.setBinary(i)
 
 	def _set_objective(self):
-		coeffs = [0] * (self.N)
-		coeffs.append(1)
+		L = self.N * self.N + self.N
+		k = self.N
+		coeffs = [0] * L
+		while k < L:
+			coeffs[k] = 1
+			k += self.N + 1
+
+		print "objective coeffs ", coeffs
+
 		lp.setObjective(coeffs, mode="minimize")
 		
 
@@ -76,4 +120,5 @@ class Solver():
 
 s = Solver()
 s.initialize("/home/crisefd/Documentos/Python/prueba.txt")
-print s.solve_()
+#print "Solution ", 
+s.solve_()
