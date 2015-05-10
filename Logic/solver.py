@@ -32,10 +32,11 @@ class Solver():
 
 	def solve_(self):
 		self._add_constraints()
-		self._set_objective()
+		r = self._set_objective()
 		lp.solve()
 		print "=========================================="
 		print "Solution: ", lp.getSolution()
+		print "Solucion with indices: ", lp.getSolution(r)
 		print "Solution value: ", lp.getObjectiveValue()
 		print "Info: ", lp.getInfo('Iterations')
 
@@ -88,14 +89,17 @@ class Solver():
 		print "Constraints coeffs", coefficients
 		print "rhs ", rhs
 		lp.addConstraint((indices, coefficients), "<=", rhs)
-		c = [0] * L
-		z = 0
-		while z < L:
-			c[z] = 1
-			z += self.N + 1
+		for p in range(0, self.N):
+			c = [0] * L
+			z = p
+			while z < L:
+				c[z] = 1
+				z += self.N + 1
+			print "Last constraint coeffs ", c
+			lp.addConstraint(c, "=", 1)
 
-		print "Last constraint coeffs ", c
-		lp.addConstraint(c, "==", 1)
+		#print "Last constraint coeffs ", c
+		
 		lp.setBinary(indices)
 		#for i in range(0, L):
 		#	lp.setBinary(i)
@@ -103,14 +107,17 @@ class Solver():
 	def _set_objective(self):
 		L = self.N * self.N + self.N
 		k = self.N
+		r = []
 		coeffs = [0] * L
 		while k < L:
+			r.append(k)
 			coeffs[k] = 1
 			k += self.N + 1
 
 		print "objective coeffs ", coeffs
 
 		lp.setObjective(coeffs, mode="minimize")
+		return r
 		
 
 
