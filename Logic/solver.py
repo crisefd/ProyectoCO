@@ -34,11 +34,18 @@ class Solver():
 		self._add_constraints()
 		r = self._set_objective()
 		lp.solve()
-		print "=========================================="
-		print "Solution: ", lp.getSolution()
-		print "Solucion with indices: ", lp.getSolution(r)
-		print "Solution value: ", lp.getObjectiveValue()
-		print "Info: ", lp.getInfo('Iterations')
+		solution = ''.join(str(e) + "," for e in lp.getSolution())
+		indices_solution = ''.join(str(e)+ ", " for e in lp.getSolution(r))
+		solution_value = str(lp.getObjectiveValue())
+		iterations = str(lp.getInfo('Iterations'))
+		output = {'solution':solution,'indices_solution':indices_solution,
+					'solution_value':solution_value,'Iterations':iterations}
+		#print "=========================================="
+		#print "Solution: ", lp.getSolution()
+		#print "Solucion with indices: ", lp.getSolution(r)
+		#print "Solution value: ", lp.getObjectiveValue()
+		#print "Info: ", lp.getInfo('Iterations')
+		return output
 
 	def _add_constraints(self):
 
@@ -125,7 +132,7 @@ class Solver():
 
 		
 
-s = Solver()
-s.initialize("/home/crisefd/Documentos/Python/prueba.txt")
+#s = Solver()
+#s.initialize("/home/crisefd/Documentos/Python/prueba.txt")
 #print "Solution ", 
-s.solve_()
+#s.solve_()
