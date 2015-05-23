@@ -39,12 +39,12 @@ except IOError as err:
 class AppGUI(QtGui.QFrame):
 	def __init__(self):
 		super(AppGUI, self).__init__()
-		self.solver = solver.Solver()
+		self.solver = solver.Solver1()
 		path = QtGui.QFileDialog.getOpenFileName(None,
    			 _fromUtf8("Open File"), "/home", _fromUtf8("Files (*.txt *.ini)"))
 		self.solver.initialize(path)
-		data = self.solver.solve_()
-		str_data = "Solution: "+ data['solution'] + "\n" + "Indices Solution: "+ data['indices_solution'] + "\n" + "Solution Value: "+ data['solution_value'] + "\n" +"Iterations: "+ data['Iterations']
+		data = self.solver.solve()
+		str_data = "Configuration:\n"+ data['msg'] + "\n" + "Solution: "+ data['indices_solution'] + "\n" + "Solution Value: "+ data['solution_value'] + "\n" +"Iterations: "+ data['Iterations']
 		msgBox = QtGui.QMessageBox.information(self, _fromUtf8("Salida"),_fromUtf8(str_data), QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
 		#self.close()
 
