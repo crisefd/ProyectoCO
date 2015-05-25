@@ -222,7 +222,9 @@ class Solver2(Solver):
 		#Setting the amount of the variables in the matrix
 		L = self.M * self.M + 2
 		indices = [i for i in range(0, L)]
-		lp.setBinary(indices)
+		ind = indices[0: L - 2]
+		print "ind", ind
+		lp.setBinary(ind)
 		print "Indices=", indices
 		#rhs = [0] * (2*self.M)
 		#print "rhs=", rhs
@@ -360,7 +362,7 @@ class Solver2(Solver):
 		L = self.M * self.M + 2
 		coefficients = [0] * L
 		coefficients[L - 2] = 1
-		coefficients[L - 1] = 1
+		coefficients[L - 1] = -1
 		print "==========Objective ", coefficients
 		lp.setObjective(coefficients, mode="minimize")
 
