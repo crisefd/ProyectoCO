@@ -180,35 +180,30 @@ class Solver2(Solver):
 		self._set_objective()
 		lp.solve()
 		sol = lp.getSolution()
-		#print ("=========>", len(sol))
-		#sol_matrix = []
+		print sol
 		msg = ""
-		k = 0
-		p = self.M
+		start = 0
+		end = self.M
 		for i in range(0, self.M):
-			#print "k=",k," p=",p
 			msg += "knapsack " + str(i) + " boxes: "
-			row = sol[k:p]
-			for j in range(0, len(row)):
-				if row[j] == 1:
+			#print "start ", start
+			#print "end", end 
+			row = sol[start:end]
+			print "row", row
+			for j in range(0, self.M):
+				num = row[j]
+				print "row[j]=",num
+				if num != 0.0:
+					print "xD"
 					msg += str(j) + ", "
-
-			print row
 			msg += "\n"
-			#sol_matrix.append(row)
-			k += self.M + 1
-			p += self.M + 1
-		#solution = ''.join(str(e) + "," for e in sol)
+			start = end
+			end = end + self.M
 		indices_solution = ''.join(str(e)+ ", " for e in lp.getSolution([L - 2, L - 1]))
 		solution_value = str(lp.getObjectiveValue())
 		iterations = str(lp.getInfo('Iterations'))
 		output = {'msg':msg,'indices_solution':indices_solution,
 					'solution_value':solution_value,'Iterations':iterations}
-		#print "=========================================="
-		#print "Solution: ", lp.getSolution()
-		#print "Solucion with indices: ", lp.getSolution(r)
-		#print "Solution value: ", lp.getObjectiveValue()
-		#print "Info: ", lp.getInfo('Iterations')
 		lp = None
 		return output
 
@@ -222,9 +217,12 @@ class Solver2(Solver):
 		#Setting the amount of the variables in the matrix
 		L = self.M * self.M + 2
 		indices = [i for i in range(0, L)]
-		ind = indices[0: L - 2]
-		print "ind", ind
-		lp.setBinary(ind)
+		bin_ind = indices[0: L - 2]
+		int_ind = indices[L - 2: L]
+		print "bin_ind", bin_ind
+		print "int_ind", int_ind
+		lp.setBinary(bin_ind)
+		lp.setInteger(int_ind)
 		print "Indices=", indices
 		#rhs = [0] * (2*self.M)
 		#print "rhs=", rhs
