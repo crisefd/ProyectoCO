@@ -46,12 +46,11 @@ class Solver1(Solver):
 
 	def solve(self):
 		global lp
+		self.L = self.N * self.N + self.N
 		self._add_constraints()
 		r = self._set_objective()
 		lp.solve()
 		sol = lp.getSolution()
-		#print ("=========>", len(sol))
-		#sol_matrix = []
 		msg = ""
 		k = 0
 		p = self.N
@@ -60,10 +59,10 @@ class Solver1(Solver):
 			msg += "knapsack " + str(i) + " boxes: "
 			row = sol[k:p]
 			for j in range(0, len(row)):
-				if row[j] == 1:
+				if row[j] != 0:
 					msg += str(j) + ", "
 
-			print row
+			#print row
 			msg += "\n"
 			#sol_matrix.append(row)
 			k += self.N +1
@@ -98,10 +97,10 @@ class Solver1(Solver):
 			coeff_vp.append(coeff_v[i] + coeff_p[i])
 		#coeffs = [1] * (self.N )
 		#coeffs.append(-1)
-		#Setting the amount of the variables in the matrix
-		L = self.N * self.N + self.N
+		
+		
 		#Setting the indices of the variables in the matrix
-		indices = [i for i in range(0, L)]
+		indices = [i for i in range(0, self.L)]
 		#Setting the right hand side constants of the equations
 		rhs = [0 for i in range(0, self.N)]
 		#Initilizing the coefficients  as an empty list
@@ -110,7 +109,7 @@ class Solver1(Solver):
 		for i in range(0, self.N):
 			n = 0
 			#Initializing a coefficient row to zeros
-			tuple_ = [0] * L
+			tuple_ = [0] * self.L
 			if i==0:
 				x = k
 				y = (i + 1) * (self.N + 1)
@@ -138,9 +137,9 @@ class Solver1(Solver):
 		lp.addConstraint((indices, coefficients), "<=", rhs)
 		#Adding constraint c) to the matrix
 		for p in range(0, self.N):
-			c = [0] * L
+			c = [0] * self.L
 			z = p
-			while z < L:
+			while z < self.L:
 				c[z] = 1
 				z += self.N + 1
 			#print "Last constraint coeffs ", c
@@ -150,11 +149,11 @@ class Solver1(Solver):
 
 	def _set_objective(self):
 		global lp
-		L = self.N * self.N + self.N
+		#L = self.N * self.N + self.N
 		k = self.N
 		r = []
-		coeffs = [0] * L
-		while k < L:
+		coeffs = [0] * self.L
+		while k < self.L:
 			r.append(k)
 			coeffs[k] = 1
 			k += self.N + 1
@@ -163,10 +162,11 @@ class Solver1(Solver):
 		return r
 		
 class Solver2(Solver):
-	def initialize(self, M, p, v, P, V):
+	def initialize(self, M, N, p, v, P, V):
 		global lp
 		lp = LP()
 		self.M = M
+		self.N = N
 		self.p = p
 		self.v = v
 		self.P = P
@@ -174,8 +174,8 @@ class Solver2(Solver):
 
 	def solve(self):
 		global lp
-		L = self.M * self.M + 2
-		print "L=", L
+		self.L = self.N * self.M + 2
+		print "L=", self.L
 		self._add_constraints()
 		self._set_objective()
 		lp.solve()
@@ -183,7 +183,7 @@ class Solver2(Solver):
 		print sol
 		msg = ""
 		start = 0
-		end = self.M
+		end = self.N
 		for i in range(0, self.M):
 			msg += "knapsack " + str(i) + " boxes: "
 			#print "start ", start
@@ -199,7 +199,7 @@ class Solver2(Solver):
 			msg += "\n"
 			start = end
 			end = end + self.M
-		indices_solution = ''.join(str(e)+ ", " for e in lp.getSolution([L - 2, L - 1]))
+		indices_solution = ''.join(str(e)+ ", " for e in lp.getSolution([self.L - 2, self.L - 1]))
 		solution_value = str(lp.getObjectiveValue())
 		iterations = str(lp.getInfo('Iterations'))
 		output = {'msg':msg,'indices_solution':indices_solution,
@@ -214,11 +214,9 @@ class Solver2(Solver):
 		#coeff_p.append(self.P * -1)
 		coeff_v = self.v[:]
 		#coeff_v.append(self.V * -1)
-		#Setting the amount of the variables in the matrix
-		L = self.M * self.M + 2
-		indices = [i for i in range(0, L)]
-		bin_ind = indices[0: L - 2]
-		int_ind = indices[L - 2: L]
+		indices = [i for i in range(0, self.L)]
+		bin_ind = indices[0: self.L - 2]
+		int_ind = indices[self.L - 2: self.L]
 		print "bin_ind", bin_ind
 		print "int_ind", int_ind
 		lp.setBinary(bin_ind)
@@ -236,15 +234,15 @@ class Solver2(Solver):
 		k = 0
 		for i in range(0, self.M):
 			n = 0
-			tuple_ = [0] * L
+			tuple_ = [0] * self.L
 			if i==0:
 				x = k
-				y = (i + 1) * (self.M)
-				k = k + self.M 
+				y = (i + 1) * (self.N)
+				k = k + self.N 
 			else:
 				x = k #<--------------------------------------
-				y = (i + 1) * (self.M)
-				k = k + self.M #<-------------------------------
+				y = (i + 1) * (self.N)
+				k = k + self.N #<-------------------------------
 			print "x=", x
 			print "y=", y
 			for j in range(x, y):
@@ -263,15 +261,15 @@ class Solver2(Solver):
 		k = 0
 		for i in range(0, self.M):
 			n = 0
-			tuple_ = [0] * L
+			tuple_ = [0] * self.L
 			if i==0:
 				x = k
-				y = (i + 1) * (self.M)
-				k = k + self.M 
+				y = (i + 1) * (self.N)
+				k = k + self.N 
 			else:
 				x = k #<--------------------------------------
-				y = (i + 1) * (self.M)
-				k = k + self.M #<-------------------------------
+				y = (i + 1) * (self.N)
+				k = k + self.N #<-------------------------------
 			print "x=", x
 			print "y=", y
 			for j in range(x, y):
@@ -285,13 +283,13 @@ class Solver2(Solver):
 		lp.addConstraint(coefficients, "<=", self.V)
 
 		print "==========Restriccion c)"
-		for i in range(0, self.M):
-			coefficients = [0] * L
+		for i in range(0, self.N):
+			coefficients = [0] * self.L
 			z = i
-			while z < L - 2:
+			while z < self.L - 2:
 				print "z=", z
 				coefficients[z] = 1
-				z += self.M
+				z += self.N
 			#print "Last constraint coeffs ", c
 			lp.addConstraint(coefficients, "=", 1)
 			print coefficients
@@ -303,15 +301,15 @@ class Solver2(Solver):
 		for i in range(0, self.M):
 			n = 0
 			#Initializing a coefficient row to zeros
-			tuple_ = [0] * L
+			tuple_ = [0] * self.L
 			if i==0:
 				x = k
-				y = (i + 1) * (self.M)
-				k = k + self.M
+				y = (i + 1) * (self.N)
+				k = k + self.N
 			else:
 				x = k 
-				y = (i + 1) * (self.M)
-				k = k + self.M
+				y = (i + 1) * (self.N)
+				k = k + self.N
 			print "x=", x
 			print "y=", y
 			for j in range(x, y):
@@ -320,7 +318,7 @@ class Solver2(Solver):
 				except IndexError:
 					print "Error j=",j,"n=", n
 				n += 1
-			tuple_[L - 2] = -1
+			tuple_[self.L - 2] = -1
 			#Appending new row to the coefficients
 			coefficients.append(tuple_)
 		print "coefficients=", coefficients
@@ -332,15 +330,15 @@ class Solver2(Solver):
 		for i in range(0, self.M):
 			n = 0
 			#Initializing a coefficient row to zeros
-			tuple_ = [0] * L
+			tuple_ = [0] * self.L
 			if i==0:
 				x = k
-				y = (i + 1) * (self.M)
-				k = k + self.M
+				y = (i + 1) * (self.N)
+				k = k + self.N
 			else:
 				x = k
-				y = (i + 1) * (self.M)
-				k = k + self.M
+				y = (i + 1) * (self.N)
+				k = k + self.N
 			print "x=", x
 			print "y=", y
 			for j in range(x, y):
@@ -349,7 +347,7 @@ class Solver2(Solver):
 				except IndexError:
 					print "Error j=",j,"n=", n
 				n += 1
-			tuple_[L - 1] = 1
+			tuple_[self.L - 1] = 1
 			#Appending new row to the coefficients
 			coefficients.append(tuple_)
 		print "coefficients=", coefficients
@@ -357,10 +355,10 @@ class Solver2(Solver):
 
 	def _set_objective(self):
 		global lp
-		L = self.M * self.M + 2
-		coefficients = [0] * L
-		coefficients[L - 2] = 1
-		coefficients[L - 1] = -1
+		#L = self.M * self.M + 2
+		coefficients = [0] * self.L
+		coefficients[self.L - 2] = 1
+		coefficients[self.L - 1] = -1
 		print "==========Objective ", coefficients
 		lp.setObjective(coefficients, mode="minimize")
 

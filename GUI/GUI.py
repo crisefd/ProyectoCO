@@ -134,12 +134,13 @@ class Frame(QtGui.QFrame):
 		solver_.initialize(path)
 		data = solver_.solve()
 		M = int(float(data['solution_value']))
+		N = solver_.N
 		P = solver_.P
 		p = solver_.p
 		V = solver_.V
 		v = solver_.v
 		solver_ = solver.Solver2()
-		solver_.initialize(M, p, v, P, V)
+		solver_.initialize(M, N, p, v, P, V)
 		data = solver_.solve()
 		str_data = "Configuration:\n"+ data['msg'] + "\n" + "Solution: "+ data['indices_solution'] + "\n" + "Solution Value: "+ data['solution_value'] + "\n" +"Iterations: "+ data['Iterations']
 		msgBox = QtGui.QMessageBox.information(self, _fromUtf8("Salida"),_fromUtf8(str_data), QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
@@ -151,7 +152,11 @@ class Frame(QtGui.QFrame):
         self.buttonTwo.setText(_translate("Frame", "Problem Two", None))
 
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
-    w = Frame()
-    w.show()
-    sys.exit(app.exec_())
+	try:
+	    app = QtGui.QApplication(sys.argv)
+	    w = Frame()
+	    w.show()
+	    sys.exit(app.exec_())
+	except Exception as ex:
+		print ex
+		sys.exit()
