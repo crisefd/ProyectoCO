@@ -1,6 +1,8 @@
 import sys
 import imp
 import os
+import timeit
+import time
 from pylpsolve import LP
 from numpy import *
 from abc import ABCMeta, abstractmethod
@@ -49,35 +51,28 @@ class Solver1(Solver):
 		self.L = self.N * self.N + self.N
 		self._add_constraints()
 		r = self._set_objective()
+		start_time = time.time()
 		lp.solve()
+		elapsed = time.time() - start_time
 		sol = lp.getSolution()
 		msg = ""
 		k = 0
 		p = self.N
 		for i in range(0, self.N):
-			#print "k=",k," p=",p
 			msg += "knapsack " + str(i) + " boxes: "
 			row = sol[k:p]
 			for j in range(0, len(row)):
 				if row[j] != 0:
 					msg += str(j) + ", "
-
-			#print row
 			msg += "\n"
-			#sol_matrix.append(row)
-			k += self.N +1
-			p += self.N +1
-		#solution = ''.join(str(e) + "," for e in sol)
+			k += self.N + 1
+			p += self.N + 1
 		indices_solution = ''.join(str(e)+ ", " for e in lp.getSolution(r))
 		solution_value = str(lp.getObjectiveValue())
 		iterations = str(lp.getInfo('Iterations'))
 		output = {'msg':msg,'indices_solution':indices_solution,
-					'solution_value':solution_value,'Iterations':iterations}
-		#print "=========================================="
-		#print "Solution: ", lp.getSolution()
-		#print "Solucion with indices: ", lp.getSolution(r)
-		#print "Solution value: ", lp.getObjectiveValue()
-		#print "Info: ", lp.getInfo('Iterations')
+					'solution_value':solution_value,'iterations':iterations,
+					'execution_time': str(elapsed)}
 		lp = None
 		return output
 
@@ -178,7 +173,9 @@ class Solver2(Solver):
 		print "L=", self.L
 		self._add_constraints()
 		self._set_objective()
+		start_time = time.time()
 		lp.solve()
+		elapsed = time.time() - start_time
 		sol = lp.getSolution()
 		print sol
 		msg = ""
@@ -189,21 +186,22 @@ class Solver2(Solver):
 			#print "start ", start
 			#print "end", end 
 			row = sol[start:end]
-			print "row", row
-			for j in range(0, self.M):
+			#print "row", row
+			for j in range(0, self.N):
 				num = row[j]
-				print "row[j]=",num
+				#print "row[j]=",num
 				if num != 0.0:
-					print "xD"
+					#print "xD"
 					msg += str(j) + ", "
 			msg += "\n"
 			start = end
-			end = end + self.M
+			end = end + self.N
 		indices_solution = ''.join(str(e)+ ", " for e in lp.getSolution([self.L - 2, self.L - 1]))
 		solution_value = str(lp.getObjectiveValue())
 		iterations = str(lp.getInfo('Iterations'))
 		output = {'msg':msg,'indices_solution':indices_solution,
-					'solution_value':solution_value,'Iterations':iterations}
+					'solution_value':solution_value,'iterations':iterations,
+					'execution_time':str(elapsed)}
 		lp = None
 		return output
 
