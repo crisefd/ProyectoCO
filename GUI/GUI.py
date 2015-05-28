@@ -123,7 +123,7 @@ class Frame(QtGui.QFrame):
    			 _fromUtf8("Open File"), "/home", _fromUtf8("Files (*.txt *.ini)"))
 		solver_.initialize(path)
 		data = solver_.solve()
-		str_data = "Configuration:\n"+ data['msg'] + "\n" + "Solution: "+ data['indices_solution'] + "\n" + "Solution Value: "+ data['solution_value'] + "\n" +"Iterations: "+ data['Iterations']
+		str_data = "Configuration:\n"+ data['msg'] + "\n" + "Solution: "+ data['indices_solution'] + "\n" + "Solution Value: "+ data['solution_value'] + "\n" +"Iterations: "+ data['iterations'] + "\n" + "Execution Time: "+ data["execution_time"] + "secs"
 		msgBox = QtGui.QMessageBox.information(self, _fromUtf8("Salida"),_fromUtf8(str_data), QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
 		self.close()
 
@@ -142,7 +142,7 @@ class Frame(QtGui.QFrame):
 		solver_ = solver.Solver2()
 		solver_.initialize(M, N, p, v, P, V)
 		data = solver_.solve()
-		str_data = "Configuration:\n"+ data['msg'] + "\n" + "Solution: "+ data['indices_solution'] + "\n" + "Solution Value: "+ data['solution_value'] + "\n" +"Iterations: "+ data['Iterations']
+		str_data = "Configuration:\n"+ data['msg'] + "\n" + "Solution: "+ data['indices_solution'] + "\n" + "Solution Value: "+ data['solution_value'] + "\n" +"Iterations: "+ data['iterations'] + "\n" + "Execution Time: "+ data["execution_time"] + "secs"
 		msgBox = QtGui.QMessageBox.information(self, _fromUtf8("Salida"),_fromUtf8(str_data), QtGui.QMessageBox.Ok, QtGui.QMessageBox.Ok)
 		self.close()
 
