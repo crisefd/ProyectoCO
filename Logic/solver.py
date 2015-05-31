@@ -126,7 +126,7 @@ class Solver1(Solver):
 			#Appending new row to the coefficients
 			coefficients.append(tuple_)
 		#print "\n indices ", indices
-		#print "Constraints coeffs", coefficients
+		print "Constraints coeffs", coefficients
 		#print "rhs ", rhs
 		#Adding constraints a) and b) to the matrix
 		lp.addConstraint((indices, coefficients), "<=", rhs)
@@ -137,7 +137,7 @@ class Solver1(Solver):
 			while z < self.L:
 				c[z] = 1
 				z += self.N + 1
-			#print "Last constraint coeffs ", c
+			print "Last constraint coeffs ", c
 			lp.addConstraint(c, "=", 1)
 		#Setting all variables for the a) and b) constraints as binary variables
 		lp.setBinary(indices)
@@ -152,7 +152,7 @@ class Solver1(Solver):
 			r.append(k)
 			coeffs[k] = 1
 			k += self.N + 1
-		#print "objective coeffs ", coeffs
+		print "objective coeffs ", coeffs
 		lp.setObjective(coeffs, mode="minimize")
 		return r
 		
@@ -218,7 +218,7 @@ class Solver2(Solver):
 		print "bin_ind", bin_ind
 		print "int_ind", int_ind
 		lp.setBinary(bin_ind)
-		lp.setInteger(int_ind)
+		#lp.setInteger(int_ind)
 		print "Indices=", indices
 		#rhs = [0] * (2*self.M)
 		#print "rhs=", rhs
